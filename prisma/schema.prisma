@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+
+  height        Float?
+  weight        Float?
+  age           Int?
+  sex           String?
+  activityLevel String?
+  onboarded     Boolean   @default(false)
+
+  accounts   Account[]
+  sessions   Session[]
+  dailyGoals DailyGoal[]
+  mealLogs   MealLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model DailyGoal {
+  id        String   @id @default(cuid())
+  userId    String
+  calories  Int      @default(2000)
+  protein   Float    @default(150)
+  carbs     Float    @default(200)
+  fat       Float    @default(65)
+  fiber     Float    @default(30)
+  startDate DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startDate])
+}
+
+model MealLog {
+  id       String   @id @default(cuid())
+  userId   String
+  date     DateTime @db.Date
+  mealType String
+
+  fdcId     Int
+  foodName  String
+  brandName String?
+
+  servingSize Float
+  servingUnit String @default("g")
+  quantity    Float  @default(1)
+
+  calories Float
+  protein  Float
+  carbs    Float
+  fat      Float
+  fiber    Float
+
+  weighedWithScale Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([userId, date, mealType])
+}
