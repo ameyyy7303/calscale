@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Scale, Loader2 } from "lucide-react";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import { registerSchema } from "@/lib/validators";
 import { Button } from "@/components/ui/button";

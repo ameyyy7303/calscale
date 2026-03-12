@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { mealLogSchema } from "@/lib/validators";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ meal }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: z.prettifyError(error) }, { status: 400 });
+      return NextResponse.json({ error: error.issues[0]?.message || "Validation failed" }, { status: 400 });
     }
     console.error("Meal log error:", error);
     return NextResponse.json({ error: "Failed to log meal" }, { status: 500 });

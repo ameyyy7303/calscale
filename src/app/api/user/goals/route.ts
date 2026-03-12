@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { goalSchema } from "@/lib/validators";
 import { DEFAULT_GOALS } from "@/lib/constants";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export async function GET() {
   const session = await auth();
@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ goal });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: z.prettifyError(error) }, { status: 400 });
+      return NextResponse.json({ error: error.issues[0]?.message || "Validation failed" }, { status: 400 });
     }
     return NextResponse.json({ error: "Failed to update goals" }, { status: 500 });
   }
