@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { searchFoods } from "@/lib/usda";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = request.nextUrl;
   const q = searchParams.get("q");
   const page = parseInt(searchParams.get("page") || "1");

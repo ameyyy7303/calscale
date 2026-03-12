@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Info, RotateCcw, ArrowRight, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,14 @@ import {
 import { cn } from "@/lib/utils";
 
 export default function ScalePage() {
+  return (
+    <Suspense>
+      <ScalePageInner />
+    </Suspense>
+  );
+}
+
+function ScalePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Loader2, Apple } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,14 @@ import { FoodDetailSheet } from "@/components/food/food-detail-sheet";
 import type { FoodItem } from "@/types/food";
 
 export default function LogPage() {
+  return (
+    <Suspense>
+      <LogPageInner />
+    </Suspense>
+  );
+}
+
+function LogPageInner() {
   const searchParams = useSearchParams();
   const scaleWeight = searchParams.get("weight");
 

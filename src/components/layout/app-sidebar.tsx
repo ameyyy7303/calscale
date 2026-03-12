@@ -2,19 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
 import {
   LayoutDashboard,
   Search,
   Scale,
   BarChart3,
   Settings,
-  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -26,16 +22,6 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
-
-  const initials = session?.user?.name
-    ? session.user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "?";
 
   return (
     <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 flex-col border-r border-border bg-sidebar">
@@ -74,31 +60,11 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* User section */}
-      <div className="border-t border-border p-3">
-        <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <Avatar size="sm">
-            <AvatarImage src={session?.user?.image ?? undefined} />
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 truncate">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">
-              {session?.user?.name ?? "User"}
-            </p>
-            <p className="truncate text-xs text-muted-foreground">
-              {session?.user?.email ?? ""}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="shrink-0 text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="size-3.5" />
-            <span className="sr-only">Sign out</span>
-          </Button>
-        </div>
+      {/* Footer */}
+      <div className="border-t border-border p-4">
+        <p className="text-[10px] text-muted-foreground text-center">
+          Free to use — no account needed
+        </p>
       </div>
     </aside>
   );

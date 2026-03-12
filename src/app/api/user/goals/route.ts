@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { goalSchema } from "@/lib/validators";
 import { DEFAULT_GOALS } from "@/lib/constants";
+import { ANON_USER_ID } from "@/lib/user";
 import { z } from "zod";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const goal = await db.dailyGoal.findFirst({
-    where: { userId: session.user.id },
+    where: { userId: ANON_USER_ID },
     orderBy: { startDate: "desc" },
   });
 
@@ -20,18 +15,13 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const data = goalSchema.parse(body);
 
     const goal = await db.dailyGoal.create({
       data: {
-        userId: session.user.id,
+        userId: ANON_USER_ID,
         ...data,
         startDate: new Date(),
       },

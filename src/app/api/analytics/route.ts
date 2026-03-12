@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { ANON_USER_ID } from "@/lib/user";
 import {
   startOfWeek,
   endOfWeek,
@@ -11,11 +11,6 @@ import {
 } from "date-fns";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = request.nextUrl;
   const period = searchParams.get("period") || "week";
   const dateStr = searchParams.get("date") || new Date().toISOString().split("T")[0];
@@ -32,7 +27,7 @@ export async function GET(request: NextRequest) {
 
   const meals = await db.mealLog.findMany({
     where: {
-      userId: session.user.id,
+      userId: ANON_USER_ID,
       date: { gte: start, lte: end },
     },
   });

@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { mealLogSchema } from "@/lib/validators";
+import { ANON_USER_ID } from "@/lib/user";
 import { z } from "zod";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = request.nextUrl;
   const date = searchParams.get("date");
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
-  let where: Record<string, unknown> = { userId: session.user.id };
+  const where: Record<string, unknown> = { userId: ANON_USER_ID };
 
   if (date) {
     where.date = new Date(date);
@@ -34,18 +29,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const data = mealLogSchema.parse(body);
 
     const meal = await db.mealLog.create({
       data: {
-        userId: session.user.id,
+        userId: ANON_USER_ID,
         date: new Date(data.date),
         mealType: data.mealType,
         fdcId: data.fdcId,
